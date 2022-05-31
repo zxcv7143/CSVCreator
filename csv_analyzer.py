@@ -16,40 +16,13 @@ def main():
         bitbucket_token, repo_name, branch_name)
     pull_requests = bitbucket_helper.parse_pull_requests(reponse_data)
     print('\n')
+    for pr in pull_requests:
+        comments_data = bitbucket_helper.get_pull_request_comments(
+            bitbucket_token, repo_name, pr.pull_request_id)
+        comments = bitbucket_helper.parse_pull_request_comments(comments_data)
+        pr.comments = comments
     bitbucket_helper.print_all_pull_request(pull_requests)
     print('\n')
-
-
-def select_number_of_pull_request():
-    while True:
-        try:
-            user_input = input(
-                "Please input a number of pull request for which you want to create a Pivotal story or input u to update and q to exit: ")
-            if user_input == 'u':
-                break
-            elif user_input == 'q':
-                SaverClass.delete_default_type()
-                break
-            else:
-                numberOfStory = int(user_input) - 1
-                return numberOfStory
-        except:
-            continue
-
-
-def get_selected_type():
-    selected_type = SaverClass.load_default_type()
-    if not selected_type:
-        while True:
-            print("1. Mobile \n")
-            print("2. Web \n")
-            print("3. Backend \n")
-            selected_type = int(
-                input("Please select default type of stories "))
-            if selected_type <= 3 and selected_type > 0:
-                SaverClass.save_default_type(selected_type)
-                break
-    return selected_type
 
 
 if __name__ == "__main__":

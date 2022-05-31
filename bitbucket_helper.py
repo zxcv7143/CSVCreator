@@ -1,3 +1,4 @@
+
 import urllib.request
 import json
 from types import SimpleNamespace
@@ -5,8 +6,9 @@ from types import SimpleNamespace
 
 class PullRequest:
 
-    def __init__(self, repository, title, destination_branch, tasks, resolved_tasks, has_conflict, url, origin_branch):
+    def __init__(self, pull_request_id, repository, title, destination_branch, tasks, resolved_tasks, has_conflict, url, origin_branch, comments=None):
         self.repository = repository
+        self.pull_request_id = pull_request_id
         self.title = title
         self.destination_branch = destination_branch
         self.tasks = tasks
@@ -14,16 +16,24 @@ class PullRequest:
         self.url = url
         self.origin_branch = origin_branch
         self.resolved_tasks = resolved_tasks
+        self.comments = comments
 
 
 class PullRequestActivity:
 
-    def __init__(self, id, created_date, action, commit, comment):
+    def __init__(self, id, text, action, commit, comment):
         self.id = id
-        self.created_date = created_date
+        self.text = text
         self.action = action
         self.commit = commit
         self.comment = comment
+
+
+class PullRequestComment:
+
+    def __init__(self, id, text):
+        self.id = id
+        self.text = text
 
 
 def get_pull_requests(token, repo, branchName='refs/heads/audit-final'):
@@ -39,7 +49,8 @@ def get_pull_requests(token, repo, branchName='refs/heads/audit-final'):
 def parse_pull_requests(json_text):
     data = json.loads(json_text, object_hook=lambda d: SimpleNamespace(**d))
 
-    return list(map(lambda pr: PullRequest(
+    pull_request_list = list(map(lambda pr: PullRequest(
+        pr.id,
         pr.fromRef.repository.name,
         pr.title,
         pr.toRef.displayId,
@@ -47,22 +58,24 @@ def parse_pull_requests(json_text):
         pr.properties.resolvedTaskCount,
         pr.properties.mergeResult.outcome != 'CLEAN',
         pr.links.self[0].href,
-        pr.fromRef.displayId
+        pr.fromRef.displayId,
     ),
         data.values))
+
+    return pull_request_list
 
 
 def print_all_pull_request(pull_requests):
     table_data = list(map(lambda pr: [pr.repository[0:35], pr.title[0:70],
-                                      pr.destination_branch[0:35], pr.origin_branch, pr.tasks, pr.resolved_tasks], pull_requests))
+                                      pr.destination_branch[0:35], pr.origin_branch, pr.tasks, pr.resolved_tasks, len(pr.comments)], pull_requests))
 
-    table_space = '{:<35} {:<70} {:<20} {:<50} {:<10} {:<4}'
+    table_space = '{:<20} {:<70} {:<20} {:<50} {:<10} {:<14} {:<8}'
     print('All pull request')
     print('----------------\n')
     print(table_space.format('Repository', 'Title',
-                             'Destination branch', 'Origin branch', 'Open task', 'Resolved tasks'))
+                             'Destination branch', 'Origin branch', 'Open task', 'Resolved tasks', 'Comments'))
     print(table_space.format('----------', '-----',
-                             '----------------', '---------------', '---------', '------------'))
+                             '----------------', '---------------', '---------', '--------------', '--------'))
 
     for row in table_data:
         print(table_space.format(*row))
@@ -93,19 +106,21 @@ def parse_pull_request_activity(json_text):
         data.values))
 
 
-def print_pull_request_activity(pull_request_activity):
-    table_data = list(map(lambda pr: [pr.repository[0:35], pr.title[0:70],
-                                      pr.destination_branch[0:35], pr.origin_branch, pr.tasks, 'YES' if pr.has_conflict else 'NO'], pull_request_activity))
+def get_pull_request_comments(token, repo_name, pull_request_id):
+    request = urllib.request.Request(
+        'http://wzgdcvaleja01pr:7990/rest/ui/latest/projects/WZAPP/repos/{}/pull-requests/{}/comments?limit=1000'.format(repo_name, pull_request_id))
+    request.add_header('Authorization', 'Bearer {}'.format(token))
 
-    table_space = '{:<35} {:<70} {:<20} {:<50} {:<10} {:<4}'
-    print('All pull request')
-    print('----------------\n')
-    print(table_space.format('Repository', 'Title',
-                             'Destination branch', 'Origin branch', 'Open task', 'Has Conflict'))
-    print(table_space.format('----------', '-----',
-                             '----------------', '---------------', '---------', '------------'))
+    response = urllib.request.urlopen(request)
 
-    for row in table_data:
-        print(table_space.format(*row))
+    return response.read().decode('utf-8')
 
-    print('\n')
+
+def parse_pull_request_comments(json_text):
+    data = json.loads(json_text, object_hook=lambda d: SimpleNamespace(**d))
+
+    return list(map(lambda pr: PullRequestComment(
+        pr.id,
+        pr.text,
+    ),
+        data.values))
