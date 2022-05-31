@@ -10,8 +10,8 @@ class ReportClass():
                 spamwriter = csv.writer(csvfile, delimiter=';',
                                         quotechar='|', quoting=csv.QUOTE_MINIMAL)
                 spamwriter.writerow(headers)
-                for element in iter(data):
-                    spamwriter.writerow(data.get(element))
+                for element in data:
+                    spamwriter.writerow(element)
             return file_name
         except Exception as ex:
             pass

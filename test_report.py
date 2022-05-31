@@ -5,7 +5,7 @@ def main():
     tokens = sys.argv[1:3]
     
     rowHead = list(["Header1", "Header2", "Header3"])    
-    dictData = dict(pr1=["data10", "data20", "data30"], pr2=["data11", "data21", "data31"])            
+    dictData = [["data10", "data20", "data30"], ["data11", "data21", "data31"]]            
 
     ReportClass.create_report_file('test.csv', rowHead, dictData)    
 
