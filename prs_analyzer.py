@@ -1,6 +1,5 @@
 import sys
 import bitbucket_helper
-from saver_class import SaverClass
 
 
 def main():
