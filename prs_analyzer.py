@@ -3,23 +3,23 @@ import bitbucket_helper
 
 
 def main():
-    tokens = sys.argv[1:4]
+    tokens = sys.argv[1:3]
     bitbucket_token = tokens[0] if len(tokens) > 0 else input(
         "Please input Bitbucket token ")
-    repo_names = tokens[1] if len(
-        tokens) > 1 else input("Please input repo name ")
-    branch_name = tokens[2] if len(
-        tokens) > 2 else "audit-final"
+    branch_name = tokens[1] if len(
+        tokens) > 1 else "audit-final"
 
     pull_requests = []
+    repo_names = bitbucket_helper.parse_bitbucket_repositories(
+        bitbucket_helper.get_bitbucket_repositories(bitbucket_token, "WZAPP"))
 
-    for repo_name in filter(None, repo_names.split(',')):
+    for repo_name in repo_names:
         reponse_data = bitbucket_helper.get_pull_requests(
-            bitbucket_token, repo_name, branch_name)
+            bitbucket_token, repo_name.slug, branch_name)
         prs = bitbucket_helper.parse_pull_requests(reponse_data)
         for pr in prs:
             comments_data = bitbucket_helper.get_pull_request_comments(
-                bitbucket_token, repo_name, pr.pull_request_id)
+                bitbucket_token, repo_name.slug, pr.pull_request_id)
             comments = bitbucket_helper.parse_pull_request_comments(
                 comments_data)
             pr.comments = comments

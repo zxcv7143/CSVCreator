@@ -8,7 +8,7 @@ from datetime import datetime
 import headers
 
 
-class PullRequest:    
+class PullRequest:
 
     def __init__(self, pull_request_id, repository, title, destination_branch, tasks, resolved_tasks, has_conflict, url, origin_branch, comments=None):
         self.repository = repository
@@ -38,6 +38,14 @@ class PullRequestComment:
     def __init__(self, id, text):
         self.id = id
         self.text = text
+
+
+class BitbucketRepo:
+
+    def __init__(self, id, name, slug):
+        self.id = id
+        self.name = name
+        self.slug = slug
 
 
 def get_pull_requests(token, repo, branchName='refs/heads/audit-final'):
@@ -78,20 +86,22 @@ def print_all_pull_request(pull_requests):
     print('All pull request')
     print('----------------\n')
     print(table_space.format(headers.HEADERS[0], headers.HEADERS[1], headers.HEADERS[2], headers.HEADERS[3], headers.HEADERS[4],
-        headers.HEADERS[5],headers.HEADERS[6],headers.HEADERS[7], headers.HEADERS[8]))    
+                             headers.HEADERS[5], headers.HEADERS[6], headers.HEADERS[7], headers.HEADERS[8]))
     print(table_space.format("-" * len(headers.HEADERS[0]), "-" * len(headers.HEADERS[1]), '-' * len(headers.HEADERS[2]),
-        '-' * len(headers.HEADERS[3]), '-' * len(headers.HEADERS[4]), '-' * len(headers.HEADERS[5]), '-' * len(headers.HEADERS[6]),
-        '-' * len(headers.HEADERS[7]), '-' * len(headers.HEADERS[8])))
-    
+                             '-' * len(headers.HEADERS[3]), '-' * len(headers.HEADERS[4]), '-' * len(
+                                 headers.HEADERS[5]), '-' * len(headers.HEADERS[6]),
+                             '-' * len(headers.HEADERS[7]), '-' * len(headers.HEADERS[8])))
 
     for row in table_data:
         print(table_space.format(*row))
 
-    print('\n')    
-        
-    file_name_pattern = 'Report_{0}_{1}{2}.csv'    
-    file_name = file_name_pattern.format(date.today(),datetime.today().hour, datetime.today().minute)
-    file_name_created = ReportClass.create_report_file(file_name, headers.HEADERS, table_data)    
+    print('\n')
+
+    file_name_pattern = 'Report_{0}_{1}{2}.csv'
+    file_name = file_name_pattern.format(
+        date.today(), datetime.today().hour, datetime.today().minute)
+    file_name_created = ReportClass.create_report_file(
+        file_name, headers.HEADERS, table_data)
     print('File created ' + file_name_created)
 
 
@@ -134,5 +144,26 @@ def parse_pull_request_comments(json_text):
     return list(map(lambda pr: PullRequestComment(
         pr.id,
         pr.text,
+    ),
+        data.values))
+
+
+def get_bitbucket_repositories(token, project_name):
+    request = urllib.request.Request(
+        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/{}/repos'.format(project_name))
+    request.add_header('Authorization', 'Bearer {}'.format(token))
+
+    response = urllib.request.urlopen(request)
+
+    return response.read().decode('utf-8')
+
+
+def parse_bitbucket_repositories(json_text):
+    data = json.loads(json_text, object_hook=lambda d: SimpleNamespace(**d))
+
+    return list(map(lambda pr: BitbucketRepo(
+        pr.id,
+        pr.name,
+        pr.slug
     ),
         data.values))
