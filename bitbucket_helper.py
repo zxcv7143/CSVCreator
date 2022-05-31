@@ -76,7 +76,7 @@ def print_all_pull_request(pull_requests):
     print(table_space.format('Repository', 'Title',
                              'Destination branch', 'Origin branch', 'Open task', 'Resolved tasks', 'Comments', 'High', 'Low'))
     print(table_space.format('----------', '-----',
-                             '----------------', '---------------', '---------', '--------------', '--------', '------', '------'))
+                             '----------------', '---------------', '---------', '--------------', '--------', '----', '---'))
 
     for row in table_data:
         print(table_space.format(*row))
