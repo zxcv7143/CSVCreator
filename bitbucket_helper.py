@@ -68,7 +68,7 @@ def parse_pull_requests(json_text):
 def print_all_pull_request(pull_requests):
     table_data = list(map(lambda pr: [pr.repository[0:35], pr.title[0:70],
                                       pr.destination_branch[0:35], pr.origin_branch, pr.tasks, pr.resolved_tasks,
-                                      len(pr.comments),  sum('#high' in elem.text for elem in pr.comments),  sum('#high' in elem.text for elem in pr.comments)], pull_requests))
+                                      len(pr.comments),  sum('#high' in elem.text for elem in pr.comments),  sum('#low' in elem.text for elem in pr.comments)], pull_requests))
 
     table_space = '{:<20} {:<70} {:<20} {:<50} {:<10} {:<14} {:<8} {:<4} {:<4}'
     print('All pull request')
@@ -76,7 +76,7 @@ def print_all_pull_request(pull_requests):
     print(table_space.format('Repository', 'Title',
                              'Destination branch', 'Origin branch', 'Open task', 'Resolved tasks', 'Comments', 'High', 'Low'))
     print(table_space.format('----------', '-----',
-                             '----------------', '---------------', '---------', '--------------', '--------', '----', '---'))
+                             '----------------', '---------------', '---------', '--------------', '--------', '-----', '-----'))
 
     for row in table_data:
         print(table_space.format(*row))
