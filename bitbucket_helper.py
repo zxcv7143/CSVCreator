@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 class PullRequest:
 
-    def __init__(self, repository, title, destination_branch, tasks, has_conflict, url, origin_branch):
+    def __init__(self, repository, title, destination_branch, tasks, resolved_tasks, has_conflict, url, origin_branch):
         self.repository = repository
         self.title = title
         self.destination_branch = destination_branch
@@ -13,6 +13,7 @@ class PullRequest:
         self.has_conflict = has_conflict
         self.url = url
         self.origin_branch = origin_branch
+        self.resolved_tasks = resolved_tasks
 
 
 class PullRequestActivity:
@@ -43,6 +44,7 @@ def parse_pull_requests(json_text):
         pr.title,
         pr.toRef.displayId,
         pr.properties.openTaskCount,
+        pr.properties.resolvedTaskCount,
         pr.properties.mergeResult.outcome != 'CLEAN',
         pr.links.self[0].href,
         pr.fromRef.displayId
@@ -52,13 +54,13 @@ def parse_pull_requests(json_text):
 
 def print_all_pull_request(pull_requests):
     table_data = list(map(lambda pr: [pr.repository[0:35], pr.title[0:70],
-                                      pr.destination_branch[0:35], pr.origin_branch, pr.tasks, 'YES' if pr.has_conflict else 'NO'], pull_requests))
+                                      pr.destination_branch[0:35], pr.origin_branch, pr.tasks, pr.resolved_tasks], pull_requests))
 
     table_space = '{:<35} {:<70} {:<20} {:<50} {:<10} {:<4}'
     print('All pull request')
     print('----------------\n')
     print(table_space.format('Repository', 'Title',
-                             'Destination branch', 'Origin branch', 'Open task', 'Has Conflict'))
+                             'Destination branch', 'Origin branch', 'Open task', 'Resolved tasks'))
     print(table_space.format('----------', '-----',
                              '----------------', '---------------', '---------', '------------'))
 
