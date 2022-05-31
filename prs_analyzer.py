@@ -1,17 +1,24 @@
+import argparse
 import sys
 import bitbucket_helper
 
 
 def main():
-    tokens = sys.argv[1:3]
-    bitbucket_token = tokens[0] if len(tokens) > 0 else input(
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--token', help='Bitbucket token')
+    parser.add_argument('--project', help='Bitbucket project')
+    parser.add_argument('--branch', help='Repo branch')
+
+    args = parser.parse_args()
+
+    bitbucket_token = args.token if args.token != None else input(
         "Please input Bitbucket token ")
-    branch_name = tokens[1] if len(
-        tokens) > 1 else "audit-final"
+    project_name = args.project if args.project != None else "WZAPP"
+    branch_name = args.branch if args.branch != None else "audit-final"
 
     pull_requests = []
     repo_names = bitbucket_helper.parse_bitbucket_repositories(
-        bitbucket_helper.get_bitbucket_repositories(bitbucket_token, "WZAPP"))
+        bitbucket_helper.get_bitbucket_repositories(bitbucket_token, project_name))
 
     for repo_name in repo_names:
         reponse_data = bitbucket_helper.get_pull_requests(
