@@ -1,4 +1,4 @@
-# Pull Request analizer
+# CSV Creator
 
 ## How to run
 
@@ -11,5 +11,5 @@
 ### Run app
 
 ```shell
-python3 pull-requests-analizer.py your-bitbucket-token your-pivotal-token
+python3 csv_analizer.py your-bitbucket-token repository branch
 ```
