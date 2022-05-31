@@ -80,17 +80,16 @@ def parse_pull_requests(json_text):
 def print_all_pull_request(pull_requests):
     table_data = list(map(lambda pr: [pr.repository[0:35], pr.title[0:70],
                                       pr.destination_branch[0:35], pr.origin_branch, pr.tasks, pr.resolved_tasks,
-                                      len(pr.comments),  sum('#high' in elem.text for elem in pr.comments),  sum('#low' in elem.text for elem in pr.comments)], pull_requests))
+                                      len(pr.comments),  sum('#high' in elem.text for elem in pr.comments),  sum('#medium' in elem.text for elem in pr.comments), sum('#low' in elem.text for elem in pr.comments)], pull_requests))
 
-    table_space = '{:<20} {:<70} {:<20} {:<50} {:<10} {:<14} {:<8} {:<4} {:<4}'
+    table_space = '{:<20} {:<70} {:<20} {:<50} {:<10} {:<14} {:<8} {:<4} {:<4} {:<4}'
     print('All pull request')
     print('----------------\n')
-    print(table_space.format(headers.HEADERS[0], headers.HEADERS[1], headers.HEADERS[2], headers.HEADERS[3], headers.HEADERS[4],
-                             headers.HEADERS[5], headers.HEADERS[6], headers.HEADERS[7], headers.HEADERS[8]))
-    print(table_space.format("-" * len(headers.HEADERS[0]), "-" * len(headers.HEADERS[1]), '-' * len(headers.HEADERS[2]),
-                             '-' * len(headers.HEADERS[3]), '-' * len(headers.HEADERS[4]), '-' * len(
-                                 headers.HEADERS[5]), '-' * len(headers.HEADERS[6]),
-                             '-' * len(headers.HEADERS[7]), '-' * len(headers.HEADERS[8])))
+    title_string = map(lambda header: header, headers.HEADERS)
+    print(table_space.format(*title_string))
+
+    hyphen_string = map(lambda value: "-" * len(value), headers.HEADERS)
+    print(table_space.format(*hyphen_string))
 
     for row in table_data:
         print(table_space.format(*row))
