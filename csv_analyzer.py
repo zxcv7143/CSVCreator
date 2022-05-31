@@ -10,7 +10,7 @@ def main():
     repo_name = tokens[1] if len(
         tokens) > 1 else input("Please input repo name ")
     branch_name = tokens[2] if len(
-        tokens) > 2 else "refs/heads/audit-final"
+        tokens) > 2 else "audit-final"
 
     reponse_data = bitbucket_helper.get_pull_requests(
         bitbucket_token, repo_name, branch_name)
