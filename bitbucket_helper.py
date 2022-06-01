@@ -40,7 +40,7 @@ class BitbucketRepo:
 
 def get_pull_requests(token, repo, branchName='refs/heads/audit-final'):
     request = urllib.request.Request(
-        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/WZAPP/repos/{}/pull-requests?at=refs/heads/{}'.format(repo, branchName))
+        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/WZAPP/repos/{}/pull-requests?at=refs/heads/{}&limit=1000'.format(repo, branchName))
     request.add_header('Authorization', 'Bearer {}'.format(token))
 
     response = urllib.request.urlopen(request)
@@ -116,7 +116,7 @@ def parse_pull_request_comments(json_text):
 
 def get_bitbucket_repositories(token, project_name):
     request = urllib.request.Request(
-        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/{}/repos'.format(project_name))
+        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/{}/repos?limit=1000'.format(project_name))
     request.add_header('Authorization', 'Bearer {}'.format(token))
 
     response = urllib.request.urlopen(request)
