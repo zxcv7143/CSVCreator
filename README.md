@@ -11,5 +11,5 @@
 ### Run app
 
 ```shell
-python3 csv_analizer.py your-bitbucket-token repository branch
+python3 prs_analyzer.py --token your-bitbucket-token --branch branch-name
 ```
