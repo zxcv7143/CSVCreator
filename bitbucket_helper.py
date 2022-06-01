@@ -23,16 +23,6 @@ class PullRequest:
         self.comments = comments
 
 
-class PullRequestActivity:
-
-    def __init__(self, id, text, action, commit, comment):
-        self.id = id
-        self.text = text
-        self.action = action
-        self.commit = commit
-        self.comment = comment
-
-
 class PullRequestComment:
 
     def __init__(self, id, text):
@@ -102,29 +92,6 @@ def print_all_pull_request(pull_requests):
     file_name_created = ReportClass.create_report_file(
         file_name, headers.HEADERS, table_data)
     print('File created ' + file_name_created)
-
-
-def get_pull_request_activity(token, repo_name, pull_request_id):
-    request = urllib.request.Request(
-        'http://wzgdcvaleja01pr:7990/rest/api/1.0/projects/WZAPP/repos/{}/pull-requests/{}/activities'.format(repo_name, pull_request_id))
-    request.add_header('Authorization', 'Bearer {}'.format(token))
-
-    response = urllib.request.urlopen(request)
-
-    return response.read().decode('utf-8')
-
-
-def parse_pull_request_activity(json_text):
-    data = json.loads(json_text, object_hook=lambda d: SimpleNamespace(**d))
-
-    return list(map(lambda pr: PullRequestActivity(
-        pr.id,
-        pr.createdDate,
-        pr.action,
-        pr.commit,
-        pr.comment
-    ),
-        data.values))
 
 
 def get_pull_request_comments(token, repo_name, pull_request_id):
